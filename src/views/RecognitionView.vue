@@ -138,7 +138,7 @@ const submitImg = () => {
 
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 
 .cropper-content {
   width: inherit;
@@ -154,11 +154,10 @@ const submitImg = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.croppedImg img {
-  display: block;
-  height: inherit;
+  img {
+    display: block;
+    height: inherit;
+  }
 }
 
 .recognizing {
@@ -171,9 +170,8 @@ const submitImg = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.result span {
-  color: green;
+  span {
+    color: green;
+  }
 }
 </style>

@@ -50,21 +50,20 @@ const login = () => {
 
 </script>
 
-<style scoped>
+<style lang="less" scoped>
   .container {
     width: 100vw;
     height: 90vh;
     position: relative;
     overflow: hidden;
     height: 90vh;
-  }
-
-  .container img {
-    display: block;
-    width: 8vw;
-    position: absolute;
-    left: 2vw;
-    top: 2vw;
+    img {
+      display: block;
+      width: 8vw;
+      position: absolute;
+      left: 2vw;
+      top: 2vw;
+    }
   }
 
   header {
@@ -72,18 +71,16 @@ const login = () => {
     top: 25vh;
     left: 10vw;
     z-index: 3;
-  }
-
-  header .chinese-name {
-    color: #209f37;
-    font-size: 6vw;
-    font-weight: 600;
-  }
-
-  header .english-name {
-    color: #2c1b81;
-    font-size: 1.8vw;
-    margin-top: 2vh;
+    .chinese-name {
+      color: #209f37;
+      font-size: 6vw;
+      font-weight: 600;
+    }
+    .english-name {
+      color: #2c1b81;
+      font-size: 1.8vw;
+      margin-top: 2vh;
+    }
   }
 
   .login {
@@ -100,10 +97,9 @@ const login = () => {
     border-radius: 0.5vw; 
     font-size: 1vw;
     z-index: 3;
-  }
-
-  .login:hover {
-    background-color: #4eb761;
+    &:hover {
+      background-color: #4eb761;
+    }
   }
 
   nav {
@@ -111,48 +107,39 @@ const login = () => {
     display: flex;
     position: sticky;
     top: 0;
-  }
-
-  nav a {
-    display: block;
-    width: 25%;
-    height: 10vh;
-    line-height: 10vh;
-    text-align: center;
-    font-size: 1.5vw;
-    color: #fff;
-  }
-
-  nav a:nth-child(1) {
-    background-color: #ec923f;
-  }
-
-  nav a:nth-child(1):hover {
-    background-color: #f0a660;
-  }
-
-  nav a:nth-child(2) {
-    background-color: #ea3a3a;
-  }
-
-  nav a:nth-child(2):hover {
-    background-color: #ea6262;
-  }
-
-  nav a:nth-child(3) {
-    background-color: #7a1f8a;
-  }
-
-  nav a:nth-child(3):hover {
-    background-color: #a352b1;
-  }
-
-  nav a:nth-child(4) {
-    background-color: #2c1b81;
-  }
-
-  nav a:nth-child(4):hover {
-    background-color: #695cab;
+    a {
+      display: block;
+      width: 25%;
+      height: 10vh;
+      line-height: 10vh;
+      text-align: center;
+      font-size: 1.5vw;
+      color: #fff;
+      &:nth-child(1) {
+        background-color: #ec923f;
+        &:hover {
+          background-color: #f0a660;
+        }
+      }
+      &:nth-child(2) {
+        background-color: #ea3a3a;
+        &:hover {
+          background-color: #ea6262;
+        }
+      }
+      &:nth-child(3) {
+        background-color: #7a1f8a;
+        &:hover {
+          background-color: #a352b1;
+        }
+      }
+      &:nth-child(4) {
+        background-color: #2c1b81;
+        &:hover {
+          background-color: #695cab;
+        }
+      }
+    }
   }
 
   .orange {

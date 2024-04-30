@@ -60,33 +60,31 @@
   })
 </script>
 
-<style scoped>
+<style lang="less" scoped>
   .box1 {
     width: 26vw;
     height: 72vh;
     position: relative;
-  }
-
-  .box1::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 5vw;
-    height: 5vw;
-    border-top: 1vh solid #1f2c5b;
-    border-left: 1vh solid #1f2c5b;
-  }
-
-  .box1::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 5vw;
-    height: 5vw;
-    border-top: 1vh solid #1f2c5b;
-    border-right: 1vh solid #1f2c5b;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5vw;
+      height: 5vw;
+      border-top: 1vh solid #1f2c5b;
+      border-left: 1vh solid #1f2c5b;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 5vw;
+      height: 5vw;
+      border-top: 1vh solid #1f2c5b;
+      border-right: 1vh solid #1f2c5b;
+    }
   }
 
   .box2 {
@@ -96,28 +94,26 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-  }
-
-  .box2::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 5vw;
-    height: 5vw;
-    border-bottom: 1vh solid #1f2c5b;
-    border-left: 1vh solid #1f2c5b;
-  }
-
-  .box2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 5vw;
-    height: 5vw;
-    border-bottom: 1vh solid #1f2c5b;
-    border-right: 1vh solid #1f2c5b;
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 5vw;
+      height: 5vw;
+      border-bottom: 1vh solid #1f2c5b;
+      border-left: 1vh solid #1f2c5b;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 5vw;
+      height: 5vw;
+      border-bottom: 1vh solid #1f2c5b;
+      border-right: 1vh solid #1f2c5b;
+    }
   }
 
   .score {
@@ -134,26 +130,24 @@
     width: 18vw;
     height: 18vw;
     box-shadow: 0 0 0 0.5vw #f4aab9, 0 0 0 1vw #66ccff;
-  }
-
-  .img img {
-    width: 18vw;
+    img {
+      width: 18vw;
+    }
   }
 
   ul {
     margin-top: 4vh;
-  }
-
-  ul li {
-    list-style-type: none;
-    width: 10vw;
-    height: 5vh;
-    margin: 1vh;
-    padding-left: 0.8vw;
-    border-radius: 2.5vh;
-    border: 0.5vh dotted #66ccff;
-    line-height: 4vh;
-    cursor: pointer;
+    li {
+      list-style-type: none;
+      width: 10vw;
+      height: 5vh;
+      margin: 1vh;
+      padding-left: 0.8vw;
+      border-radius: 2.5vh;
+      border: 0.5vh dotted #66ccff;
+      line-height: 4vh;
+      cursor: pointer;
+    }
   }
 
   .waiting:hover {
