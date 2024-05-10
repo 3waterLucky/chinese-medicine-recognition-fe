@@ -1,20 +1,28 @@
 <template>
   <div class="box1">
     <div class="box2">
-      <div class="score">当前得分：{{ score }}</div>
-      <div class="img">
-        <img class="img" :src="imgSrc">
-      </div>
-      <ul @click="choose">
-        请选出图中中草药的名称：
-        <li v-for="(item, index) in options"
-          class="waiting"
-          :key="index"
-          ref="li"
-          :data-index="index">
-          {{ item }}
-        </li>
-      </ul>
+      <template v-if="gaming">
+        <div class="score">当前得分：{{ score }}</div>
+        <div class="img">
+          <img class="img" :src="imgSrc">
+        </div>
+        <ul @click="choose">
+          请选出图中中草药的名称：
+          <li v-for="(item, index) in options"
+            class="waiting"
+            :key="index"
+            ref="li"
+            :data-index="index">
+            {{ item }}
+          </li>
+        </ul>
+      </template>
+      <template v-if="!gaming">
+        <div class="end">游戏结束</div>
+        <div class="finalScore">本局得分：{{ score }}</div>
+        <div class="total">您的总积分为：</div>
+        <el-button @click="restart">再来一局</el-button>
+      </template>
     </div>
   </div>
 </template>
@@ -28,6 +36,8 @@
   const imgSrc = ref('')
   const li = ref<HTMLLIElement[]>([])
   const score = ref(0)
+  const gaming = ref(true)
+
   const refreshQuestion = async () => {
     const data = await getQuestion()
     options.value = data.data.options
@@ -48,7 +58,27 @@
         refreshQuestion()
         li.value?.forEach(el => el.classList.add('waiting'))
       }, 2000);
+    } else {
+      li.value[index].style.borderColor = 'red'
+      li.value[index].style.backgroundColor = '#f4aab9'
+      li.value[options.value.findIndex(val => val === answer.value)].style.borderColor = 'green';
+      li.value[options.value.findIndex(val => val === answer.value)].style.backgroundColor = '#8bce82';
+      li.value?.forEach(el => el.classList.remove('waiting'))
+      setTimeout(() => {
+        gaming.value = false
+        // li.value.forEach(element => {
+        //   element.style.borderColor = ''
+        //   element.style.backgroundColor = ''
+        // });
+        // li.value?.forEach(el => el.classList.add('waiting'))
+      }, 2000);
     }
+  }
+
+  const restart = () => {
+    gaming.value = true
+    score.value = 0
+    refreshQuestion()
   }
 
   onBeforeMount(() => {
