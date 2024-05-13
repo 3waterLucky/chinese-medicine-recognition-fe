@@ -83,7 +83,7 @@
   import { reactive, ref } from 'vue'
   import type { FormInstance } from 'element-plus'
   import { register, login } from '@/utils/api';
-  import md5 from 'md5'
+  import { md5 } from 'js-md5'
   import { useUserStore } from '@/stores/user'
   import type { loginData, response } from '@/utils/types';
 
@@ -118,7 +118,11 @@
       }
     } catch (error) {
       console.log('catch error')
-      ElMessage.error(error.message || '注册失败')
+      if (error instanceof Error) {
+        ElMessage.error(error.message || '注册失败')
+      } else {
+        ElMessage.error('注册失败')
+      }
     }
   }
 
@@ -136,7 +140,11 @@
             loginSuccess(data, '登录成功')
           }
         } catch (error) {
-          ElMessage.error(error.message || '登录失败')
+          if (error instanceof Error) {
+            ElMessage.error(error.message || '登录失败')
+          } else {
+            ElMessage.error('登录失败')
+          }
         }
         console.log('error submit!')
         return false

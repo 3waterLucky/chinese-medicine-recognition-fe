@@ -9,10 +9,10 @@
         <ul>
           请选出图中中草药的名称：
           <li v-for="(item, index) in options"
-            class="waiting"
             :class="[
               { waiting: isWaiting },
-              item === answer ? 'correct' : 'wrong'
+              { correct: item === answer },
+              { wrong: selectedIndex === index && item !== answer }
             ]"
             :key="index"
             :data-index="index"
@@ -48,10 +48,12 @@
     answer.value = data.answer
     imgSrc.value = data.imgSrc
     selectLock.value = false
+    selectedIndex.value = -1
   }
 
   const isWaiting = ref(true)  // 是否等待用户选择
   const selectLock = ref(false)  // 选择锁，防止用户多次选择
+  const selectedIndex = ref(-1)
 
   const choose = (index: number) => {
     // 加锁，选择一个选项之后，不允许再选择
@@ -60,6 +62,7 @@
     }
     selectLock.value = true
     isWaiting.value = false
+    selectedIndex.value = index
     if (options.value[index] === answer.value) {
       score.value++
       setTimeout(() => {
@@ -178,7 +181,7 @@
       &.waiting:hover {
         background-color: #add8ed;
       }
-      &:not(.waiting) {
+      &:not(&.waiting) {
         &.correct {
           border-color: green;
           background-color: #8bce82;

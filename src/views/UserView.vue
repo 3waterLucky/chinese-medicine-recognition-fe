@@ -27,7 +27,7 @@
 
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .container {
   display: flex;
   flex-direction: column;
