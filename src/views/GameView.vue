@@ -6,13 +6,17 @@
         <div class="img">
           <img class="img" :src="imgSrc">
         </div>
-        <ul @click="choose">
+        <ul>
           请选出图中中草药的名称：
           <li v-for="(item, index) in options"
             class="waiting"
+            :class="[
+              { waiting: isWaiting },
+              item === answer ? 'correct' : 'wrong'
+            ]"
             :key="index"
-            ref="li"
-            :data-index="index">
+            :data-index="index"
+            @click="choose(index)">
             {{ item }}
           </li>
         </ul>
@@ -34,43 +38,37 @@
   const answer = ref('')
   const options = ref<string[]>([])
   const imgSrc = ref('')
-  const li = ref<HTMLLIElement[]>([])
   const score = ref(0)
   const gaming = ref(true)
 
   const refreshQuestion = async () => {
+    isWaiting.value = true
     const data = await getQuestion()
     options.value = data.options
     answer.value = data.answer
     imgSrc.value = data.imgSrc
+    selectLock.value = false
   }
 
-  const choose = (e: MouseEvent) => {
-    const index = e.target?.dataset.index
+  const isWaiting = ref(true)  // 是否等待用户选择
+  const selectLock = ref(false)  // 选择锁，防止用户多次选择
+
+  const choose = (index: number) => {
+    // 加锁，选择一个选项之后，不允许再选择
+    if (selectLock.value) {
+      return
+    }
+    selectLock.value = true
+    isWaiting.value = false
     if (options.value[index] === answer.value) {
-      li.value[index].style.borderColor = 'green'
-      li.value[index].style.backgroundColor = '#8bce82'
-      li.value?.forEach(el => el.classList.remove('waiting'))
       score.value++
       setTimeout(() => {
-        li.value[index].style.borderColor = ''
-        li.value[index].style.backgroundColor = ''
         refreshQuestion()
-        li.value?.forEach(el => el.classList.add('waiting'))
       }, 2000);
     } else {
-      li.value[index].style.borderColor = 'red'
-      li.value[index].style.backgroundColor = '#f4aab9'
-      li.value[options.value.findIndex(val => val === answer.value)].style.borderColor = 'green';
-      li.value[options.value.findIndex(val => val === answer.value)].style.backgroundColor = '#8bce82';
-      li.value?.forEach(el => el.classList.remove('waiting'))
       setTimeout(() => {
         gaming.value = false
-        // li.value.forEach(element => {
-        //   element.style.borderColor = ''
-        //   element.style.backgroundColor = ''
-        // });
-        // li.value?.forEach(el => el.classList.add('waiting'))
+        selectLock.value = false
       }, 2000);
     }
   }
@@ -177,10 +175,19 @@
       border: 0.5vh dotted #66ccff;
       line-height: 4vh;
       cursor: pointer;
+      &.waiting:hover {
+        background-color: #add8ed;
+      }
+      &:not(.waiting) {
+        &.correct {
+          border-color: green;
+          background-color: #8bce82;
+        }
+        &.wrong {
+          border-color: red;
+          background-color: #f4aab9;
+        }
+      }
     }
-  }
-
-  .waiting:hover {
-    background-color: #add8ed;
   }
 </style>
