@@ -21,7 +21,7 @@ export function getQuestion() {
 type userInfo = {
   account: string,
   name?: string,
-  psw: string,
+  pwd: string,
 }
 export function register(userInfo: userInfo) {
   return axios({
