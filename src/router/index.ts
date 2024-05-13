@@ -1,3 +1,4 @@
+import { ElMessage } from 'element-plus'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -29,6 +30,17 @@ const router = createRouter({
       component: () => import('@/views/LoginView.vue')
     }
   ]
+})
+
+// 增加路由守卫
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  if (to.name !== 'login' && !token && (to.name === 'game' || to.name === 'user')) {
+    ElMessage.error('请先登录')
+    next({ name: 'login' })
+  } else {
+    next()
+  }
 })
 
 export default router

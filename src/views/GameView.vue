@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
   import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
-  import { getQuestion } from '@/api'
+  import { getQuestion } from '@/utils/api'
 
   const answer = ref('')
   const options = ref<string[]>([])
@@ -40,9 +40,9 @@
 
   const refreshQuestion = async () => {
     const data = await getQuestion()
-    options.value = data.data.options
-    answer.value = data.data.answer
-    imgSrc.value = data.data.imgSrc
+    options.value = data.options
+    answer.value = data.answer
+    imgSrc.value = data.imgSrc
   }
 
   const choose = (e: MouseEvent) => {

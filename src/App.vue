@@ -6,7 +6,8 @@
       <div class="chinese-name">知识平台</div>
       <div class="english-name">Knowledge Platform of Chinese Medicine</div>
     </header>
-    <a class="login" @click="login">登 录</a>
+    <a class="login" @click="login" v-if="!user.userId && route.path !== '/login'">登 录</a>
+    <div class="welcome" v-if="user.userId">欢迎您，{{ user.userName }}</div>
     <div class="orange" ref="orange"></div>
     <div class="blue" ref="blue"></div>
     <div class="view" ref="view" v-show="showView">
@@ -15,21 +16,31 @@
   </div>
   <nav @click="chooseRouter">
     <router-link to="/recog">图 像 识 别</router-link>
-    <router-link to="/game">识 图 游 戏</router-link>
     <router-link to="/info">资 料 大 全</router-link>
-    <router-link to="user">用 户 信 息</router-link>
+    <router-link to="/game">识 图 游 戏</router-link>
+    <router-link to="/user">个 人 中 心</router-link>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { RouterLink, RouterView, useRouter, useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
+const user = useUserStore()
 const showView = ref(false)
 const header = ref<HTMLElement>()
 const orange = ref<HTMLElement>()
 const blue = ref<HTMLElement>()
 const router = useRouter()
+const route = useRoute()
+
+// onMounted(() => {
+//   console.log(atob(localStorage.getItem('token')!.split('.')[1]))
+//   if (localStorage.getItem('token')) {
+//     user.setUser(JSON.parse(atob(localStorage.getItem('token')!.split('.')[1])))
+//   }
+// })
 
 const chooseRouter = () => {
   showView.value = true
@@ -81,6 +92,13 @@ const login = () => {
       font-size: 1.8vw;
       margin-top: 2vh;
     }
+  }
+
+  .welcome {
+    position: absolute;
+    right: 2vw;
+    top: 2vw;
+    color: #3d68a9;
   }
 
   .login {
