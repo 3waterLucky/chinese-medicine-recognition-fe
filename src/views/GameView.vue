@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
   import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
-  import { getQuestion } from '@/utils/api'
+  import { getQuestion, submitScore } from '@/utils/api'
 
   const answer = ref('')
   const options = ref<string[]>([])
@@ -55,7 +55,7 @@
   const selectLock = ref(false)  // 选择锁，防止用户多次选择
   const selectedIndex = ref(-1)
 
-  const choose = (index: number) => {
+  const choose = async (index: number) => {
     // 加锁，选择一个选项之后，不允许再选择
     if (selectLock.value) {
       return
@@ -69,10 +69,14 @@
         refreshQuestion()
       }, 2000);
     } else {
-      setTimeout(() => {
-        gaming.value = false
-        selectLock.value = false
-      }, 2000);
+      const [submitSresult] = await Promise.all([
+        submitScore(score.value),
+        new Promise<void>(resolve => setTimeout(() => {
+          gaming.value = false
+          selectLock.value = false
+          resolve()
+        }, 2000))
+      ])
     }
   }
 
@@ -87,7 +91,9 @@
   })
 
   onBeforeUnmount(() => {
-    
+    if (gaming.value) {
+      submitScore(score.value)
+    }
   })
 </script>
 

@@ -29,6 +29,15 @@ export function getQuestion(): Promise<gameQuestion> {
   })
 }
 
+// 提交分数
+export function submitScore(score: number): Promise<response> {
+  return service({
+    method: 'POST',
+    url: '/game/score',
+    data: { score }
+  })
+}
+
 // 注册
 export function register(userInfo: userInfo): Promise<loginData> {
   return service({

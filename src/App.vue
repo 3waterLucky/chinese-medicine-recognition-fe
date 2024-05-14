@@ -15,10 +15,10 @@
     </div>
   </div>
   <nav @click="chooseRouter">
-    <router-link to="/recog">图 像 识 别</router-link>
-    <router-link to="/info">资 料 大 全</router-link>
-    <router-link to="/game">识 图 游 戏</router-link>
-    <router-link to="/user">个 人 中 心</router-link>
+    <router-link :class="{ active: route.path.startsWith('/recog') }" to="/recog">图 像 识 别</router-link>
+    <router-link :class="{ active: route.path.startsWith('/info') }" to="/info">资 料 大 全</router-link>
+    <router-link :class="{ active: route.path.startsWith('/game') }" to="/game">识 图 游 戏</router-link>
+    <router-link :class="{ active: route.path.startsWith('/user') }" to="/user">个 人 中 心</router-link>
   </nav>
 </template>
 
@@ -35,12 +35,12 @@ const blue = ref<HTMLElement>()
 const router = useRouter()
 const route = useRoute()
 
-// onMounted(() => {
-//   console.log(atob(localStorage.getItem('token')!.split('.')[1]))
-//   if (localStorage.getItem('token')) {
-//     user.setUser(JSON.parse(atob(localStorage.getItem('token')!.split('.')[1])))
-//   }
-// })
+onMounted(() => {
+  console.log(atob(localStorage.getItem('token')!.split('.')[1]))
+  if (localStorage.getItem('token')) {
+    user.setUser(JSON.parse(decodeURIComponent(atob(localStorage.getItem('token')!.split('.')[1]))))
+  }
+})
 
 const chooseRouter = () => {
   showView.value = true
@@ -74,6 +74,7 @@ const login = () => {
       position: absolute;
       left: 2vw;
       top: 2vw;
+      cursor: pointer;
     }
   }
 
@@ -156,6 +157,12 @@ const login = () => {
         &:hover {
           background-color: #695cab;
         }
+      }
+
+      .active {
+        background-color: #fff;
+        color: #209f37;
+        text-decoration-line: underline;
       }
     }
   }
