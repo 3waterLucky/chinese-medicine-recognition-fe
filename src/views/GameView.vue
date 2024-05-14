@@ -24,7 +24,7 @@
       <template v-if="!gaming">
         <div class="end">游戏结束</div>
         <div class="finalScore">本局得分：{{ score }}</div>
-        <div class="total">您的总积分为：</div>
+        <div class="total">您的总积分为：{{ totalScore }}</div>
         <el-button @click="restart">再来一局</el-button>
       </template>
     </div>
@@ -33,13 +33,14 @@
 
 <script setup lang="ts">
   import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
-  import { getQuestion, submitScore } from '@/utils/api'
+  import { getQuestion, submitScore } from '@/api/game'
 
   const answer = ref('')
   const options = ref<string[]>([])
   const imgSrc = ref('')
   const score = ref(0)
   const gaming = ref(true)
+  const totalScore = ref(0)
 
   const refreshQuestion = async () => {
     isWaiting.value = true
@@ -69,7 +70,7 @@
         refreshQuestion()
       }, 2000);
     } else {
-      const [submitSresult] = await Promise.all([
+      const [gameResult] = await Promise.all([
         submitScore(score.value),
         new Promise<void>(resolve => setTimeout(() => {
           gaming.value = false
@@ -77,6 +78,8 @@
           resolve()
         }, 2000))
       ])
+      console.log(gameResult)
+      totalScore.value = gameResult.totalScore
     }
   }
 

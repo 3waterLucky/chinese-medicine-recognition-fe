@@ -82,7 +82,7 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import type { FormInstance } from 'element-plus'
-  import { register, login } from '@/utils/api';
+  import { register, login } from '@/api/user';
   import { md5 } from 'js-md5'
   import { useUserStore } from '@/stores/user'
   import type { loginData, response } from '@/utils/types';

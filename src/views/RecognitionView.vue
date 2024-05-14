@@ -96,7 +96,7 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import type { UploadInstance, UploadFile } from 'element-plus'
 import 'vue-cropper/dist/index.css'
 import { VueCropper }  from "vue-cropper"
-import { getAccuracy, recognize } from '@/utils/api'
+import { getAccuracy, recognize } from '@/api/recog'
 
 const recogResult = ref({ name: '', score: 0 })
 const loading = ref(false)
