@@ -11,7 +11,11 @@
     <div class="orange" ref="orange"></div>
     <div class="blue" ref="blue"></div>
     <div class="view" ref="view" v-show="showView">
-      <router-view class="router-view" @loginSuccess="init"></router-view>
+      <router-view 
+        class="router-view" 
+        @loginSuccess="init"
+        @logoutSuccess="init"
+      ></router-view>
     </div>
   </div>
   <nav @click="chooseRouter">

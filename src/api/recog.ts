@@ -20,3 +20,12 @@ export function getAccuracy(): Promise<{ accuracy: number }> {
     url: '/recog/accuracy'
   })
 }
+
+// 提交用户评价
+export function submitEvaluate(data: { id: number, score: number }): Promise<response> {
+  return service({
+    method: 'POST',
+    url: '/recog/evaluate',
+    data
+  })
+}
