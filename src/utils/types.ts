@@ -15,6 +15,10 @@ export interface gameQuestion extends response{
   imgSrc: string
 }
 
+export interface gameResult extends response{
+  totalScore: number
+}
+
 export interface recogResult extends response{
   recog_id: number,
   m_id: number,

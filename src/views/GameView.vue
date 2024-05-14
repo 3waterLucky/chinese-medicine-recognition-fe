@@ -9,10 +9,10 @@
         <ul>
           请选出图中中草药的名称：
           <li v-for="(item, index) in options"
-            class="waiting"
             :class="[
               { waiting: isWaiting },
-              item === answer ? 'correct' : 'wrong'
+              { correct: item === answer },
+              { wrong: selectedIndex === index && item !== answer }
             ]"
             :key="index"
             :data-index="index"
@@ -24,7 +24,7 @@
       <template v-if="!gaming">
         <div class="end">游戏结束</div>
         <div class="finalScore">本局得分：{{ score }}</div>
-        <div class="total">您的总积分为：</div>
+        <div class="total">您的总积分为：{{ totalScore }}</div>
         <el-button @click="restart">再来一局</el-button>
       </template>
     </div>
@@ -33,13 +33,14 @@
 
 <script setup lang="ts">
   import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
-  import { getQuestion } from '@/utils/api'
+  import { getQuestion, submitScore } from '@/api/game'
 
   const answer = ref('')
   const options = ref<string[]>([])
   const imgSrc = ref('')
   const score = ref(0)
   const gaming = ref(true)
+  const totalScore = ref(0)
 
   const refreshQuestion = async () => {
     isWaiting.value = true
@@ -48,28 +49,37 @@
     answer.value = data.answer
     imgSrc.value = data.imgSrc
     selectLock.value = false
+    selectedIndex.value = -1
   }
 
   const isWaiting = ref(true)  // 是否等待用户选择
   const selectLock = ref(false)  // 选择锁，防止用户多次选择
+  const selectedIndex = ref(-1)
 
-  const choose = (index: number) => {
+  const choose = async (index: number) => {
     // 加锁，选择一个选项之后，不允许再选择
     if (selectLock.value) {
       return
     }
     selectLock.value = true
     isWaiting.value = false
+    selectedIndex.value = index
     if (options.value[index] === answer.value) {
       score.value++
       setTimeout(() => {
         refreshQuestion()
       }, 2000);
     } else {
-      setTimeout(() => {
-        gaming.value = false
-        selectLock.value = false
-      }, 2000);
+      const [gameResult] = await Promise.all([
+        submitScore(score.value),
+        new Promise<void>(resolve => setTimeout(() => {
+          gaming.value = false
+          selectLock.value = false
+          resolve()
+        }, 2000))
+      ])
+      console.log(gameResult)
+      totalScore.value = gameResult.totalScore
     }
   }
 
@@ -84,7 +94,9 @@
   })
 
   onBeforeUnmount(() => {
-    
+    if (gaming.value) {
+      submitScore(score.value)
+    }
   })
 </script>
 
@@ -178,7 +190,7 @@
       &.waiting:hover {
         background-color: #add8ed;
       }
-      &:not(.waiting) {
+      &:not(&.waiting) {
         &.correct {
           border-color: green;
           background-color: #8bce82;

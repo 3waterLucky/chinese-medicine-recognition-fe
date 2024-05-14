@@ -32,7 +32,7 @@
       class="list"
       direction="vertical"
       :column="4"
-      :size="size"
+      size="default"
       border
     >
       <el-descriptions-item label="图片" :span="2">
@@ -71,22 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { ComponentSize } from 'element-plus'
+import { ref } from 'vue'
 
-const size = ref<ComponentSize>('default')
 const centerDialogVisible = ref(false)
 
-const blockMargin = computed(() => {
-  const marginMap = {
-    large: '32px',
-    default: '28px',
-    small: '24px',
-  }
-  return {
-    marginTop: marginMap[size.value] || marginMap.default,
-  }
-})
 const obj = {
   "sanqi": "三七",
   "dancan": "丹参",

@@ -15,10 +15,10 @@
     </div>
   </div>
   <nav @click="chooseRouter">
-    <router-link to="/recog">图 像 识 别</router-link>
-    <router-link to="/info">资 料 大 全</router-link>
-    <router-link to="/game">识 图 游 戏</router-link>
-    <router-link to="/user">个 人 中 心</router-link>
+    <router-link :class="{ active: route.path.startsWith('/recog') }" to="/recog">图 像 识 别</router-link>
+    <router-link :class="{ active: route.path.startsWith('/info') }" to="/info">资 料 大 全</router-link>
+    <router-link :class="{ active: route.path.startsWith('/game') }" to="/game">识 图 游 戏</router-link>
+    <router-link :class="{ active: route.path.startsWith('/user') }" to="/user">个 人 中 心</router-link>
   </nav>
 </template>
 
@@ -35,12 +35,11 @@ const blue = ref<HTMLElement>()
 const router = useRouter()
 const route = useRoute()
 
-// onMounted(() => {
-//   console.log(atob(localStorage.getItem('token')!.split('.')[1]))
-//   if (localStorage.getItem('token')) {
-//     user.setUser(JSON.parse(atob(localStorage.getItem('token')!.split('.')[1])))
-//   }
-// })
+onMounted(() => {
+  if (localStorage.getItem('token')) {
+    user.setUser(JSON.parse(decodeURIComponent(atob(localStorage.getItem('token')!.split('.')[1]))))
+  }
+})
 
 const chooseRouter = () => {
   showView.value = true
@@ -52,6 +51,7 @@ const init = () => {
   showView.value = false
   orange.value!.style.transform = "rotate(-20deg)"
   blue.value!.style.transform = "rotate(-60deg)"
+  router.push('/')
 }
 
 const login = () => {
@@ -74,6 +74,7 @@ const login = () => {
       position: absolute;
       left: 2vw;
       top: 2vw;
+      cursor: pointer;
     }
   }
 
@@ -133,28 +134,47 @@ const login = () => {
       text-align: center;
       font-size: 1.5vw;
       color: #fff;
-      &:nth-child(1) {
+      &:nth-child(1):not(&.active) {
         background-color: #ec923f;
         &:hover {
           background-color: #f0a660;
         }
       }
-      &:nth-child(2) {
+      &:nth-child(2):not(&.active) {
         background-color: #ea3a3a;
         &:hover {
           background-color: #ea6262;
         }
       }
-      &:nth-child(3) {
+      &:nth-child(3):not(&.active) {
         background-color: #7a1f8a;
         &:hover {
           background-color: #a352b1;
         }
       }
-      &:nth-child(4) {
+      &:nth-child(4):not(&.active) {
         background-color: #2c1b81;
         &:hover {
           background-color: #695cab;
+        }
+      }
+
+      &.active {
+        background-color: #eee;
+        color: #209f37;
+        font-weight: bold;
+        text-decoration-line: underline;
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          top: 52%;
+          left: 30%;
+          transform: translateY(-50%);
+          width: 1vw;
+          height: 1vw;
+          border-radius: 1vw;
+          background-color: #209f37;
         }
       }
     }
