@@ -49,8 +49,8 @@
       </div>
       <div class="center">
         <div class="left">
-          <div class="result" v-show="resultReceived">识别结果<span>{{ recogResult.name }}</span></div>
-          <div class="result-score" v-show="resultReceived">得分：<span>{{ recogResult.score }}</span></div>
+          <div class="result" v-show="resultReceived">识别结果<span>{{ recogResult!.name }}</span></div>
+          <div class="result-score" v-show="resultReceived">得分：<span>{{ recogResult!.score }}</span></div>
         </div>
         <div class="croppedImg" v-show="!showCropper">
           <img :src="croppedImgSrc">
@@ -64,16 +64,19 @@
       <div class="evaluate" v-show="resultReceived">
         <div class="eval-title">此次识别结果准确吗？</div>
         <div class="option">
-          <div class="option-item">
-            <svg t="1715351486230" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1413" width="200" height="200"><path d="M1024 512c0 282.773-229.227 512-512 512S0 794.773 0 512 229.227 0 512 0s512 229.227 512 512zM268.992 269.653a82.197 82.197 0 1 0 0 164.416 82.197 82.197 0 0 0 0-164.416z m486.016 0a82.197 82.197 0 1 0 0 164.416 82.197 82.197 0 0 0 0-164.416z m-22.101 360.32C712 725.504 614.293 820.523 512.49 820.523s-205.526-95.019-226.432-190.55c0 0-6.72-28.309-32.918-28.309-22.101 0-21.93 28.31-21.93 28.31 21.888 135.637 139.477 239.231 281.28 239.231 141.824 0 259.413-103.594 281.28-239.232 0 0 6.314-28.309-19.968-28.309-31.147 0-40.896 28.31-40.896 28.31z" p-id="1414" fill="#1296db"></path></svg>
+          <div class="option-item" @click="evaSelected = 1">
+            <IconEvaColorA v-show="evaSelected === 1"/>
+            <IconEvaGreyA v-show="evaSelected !== 1" />
             <span>很准确</span>
           </div>
-          <div class="option-item">
-            <svg t="1715350682413" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="930"><path d="M512 1024C229.248 1024 0 794.752 0 512S229.248 0 512 0s512 229.248 512 512-229.248 512-512 512zM277.333 469.333a64 64 0 1 0 0-128 64 64 0 0 0 0 128z m469.334 0a64 64 0 1 0 0-128 64 64 0 0 0 0 128zM384 682.667A42.667 42.667 0 0 0 384 768h256a42.667 42.667 0 0 0 0-85.333H384z" p-id="931"></path></svg>
+          <div class="option-item" @click="evaSelected = 2">
+            <IconEvaColorB v-show="evaSelected === 2"/>
+            <IconEvaGreyB v-show="evaSelected !== 2"/>
             <span>不清楚</span>
           </div>
-          <div class="option-item">
-            <svg t="1715350749711" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1252"><path d="M512 1024A512 512 0 1 1 512 0a512 512 0 0 1 0 1024zM332.8 460.8a76.8 76.8 0 1 0 0-153.6 76.8 76.8 0 0 0 0 153.6z m358.4 0a76.8 76.8 0 1 0 0-153.6 76.8 76.8 0 0 0 0 153.6z m39.936 297.574A391.475 391.475 0 0 0 511.181 691.2c-78.746 0-154.112 23.245-218.112 66.048a25.6 25.6 0 0 0 28.365 42.598A340.275 340.275 0 0 1 511.18 742.4c69.222 0 135.168 20.48 191.283 58.368a25.6 25.6 0 1 0 28.672-42.394z" p-id="1253"></path></svg>
+          <div class="option-item" @click="evaSelected = 0">
+            <IconEvaColorC v-show="evaSelected === 0" />
+            <IconEvaGreyC v-show="evaSelected !== 0"/>
             <span>不准确</span>
           </div>
         </div>
@@ -81,7 +84,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="fileSelected = false; resultReceived = false" :disabled="loading">取 消</el-button>
-          <el-button type="primary" :loading="loading" @click="submitImg">
+          <el-button type="primary" :loading="loading" @click="handleConfirm">
             确 认
           </el-button>
         </div>
@@ -96,9 +99,25 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import type { UploadInstance, UploadFile } from 'element-plus'
 import 'vue-cropper/dist/index.css'
 import { VueCropper }  from "vue-cropper"
-import { getAccuracy, recognize } from '@/api/recog'
+import { getAccuracy, recognize, submitEvaluate } from '@/api/recog'
+import IconEvaColorA from '@/components/icons/IconEvaColorA.vue'
+import IconEvaColorB from '@/components/icons/IconEvaColorB.vue'
+import IconEvaColorC from '@/components/icons/IconEvaColorC.vue'
+import IconEvaGreyA from '@/components/icons/IconEvaGreyA.vue'
+import IconEvaGreyB from '@/components/icons/IconEvaGreyB.vue'
+import IconEvaGreyC from '@/components/icons/IconEvaGreyC.vue'
 
-const recogResult = ref({ name: '', score: 0 })
+const recogResult = ref<{
+  name: string,
+  score: number,
+  m_id: number,
+  recog_id: number
+}>({
+  name: '',
+  score: 0,
+  m_id: 0,
+  recog_id: 0
+})
 const loading = ref(false)
 const fileSelected = ref(false)
 const resultReceived = ref(false)
@@ -108,6 +127,7 @@ const dialogTitle = ref("请截取图中您要识别的中草药")
 const upload = ref<UploadInstance>()
 const cropper = ref()
 const accuracy = ref(0)
+const evaSelected = ref(-1)
 
 const cropperOption = reactive({
   img: '',
@@ -138,10 +158,17 @@ const cropperDialogClose = () => {
 }
 
 // 点击确认提交按钮
-const submitImg = () => {
+const handleConfirm = () => {
   if (resultReceived.value) {
     fileSelected.value = false
     resultReceived.value = false
+    if (evaSelected.value === 0 || evaSelected.value === 1) {
+      // 提交用户评价
+      submitEvaluate({
+        id: recogResult.value!.recog_id,
+        score: evaSelected.value
+      })
+    }
     dialogTitle.value = "请截取图中您要识别的中草药"
   } else {
     loading.value = true
@@ -299,6 +326,7 @@ const submitImg = () => {
       justify-content: center;
       align-items: center;
       margin: 0 2vw;
+      cursor: pointer;
       svg {
         width: 1.5rem;
         height: 1.5rem;

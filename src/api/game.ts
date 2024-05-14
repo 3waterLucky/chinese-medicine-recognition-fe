@@ -18,3 +18,11 @@ export function submitScore(score: number): Promise<gameResult> {
     data: { score }
   })
 }
+
+// 查询游戏记录
+export function getRecord(): Promise<{ score: number, playtimes: number }> {
+  return service({
+    method: 'GET',
+    url: '/game/record'
+  })
+}

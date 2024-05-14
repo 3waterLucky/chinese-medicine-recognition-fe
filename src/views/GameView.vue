@@ -94,7 +94,7 @@
   })
 
   onBeforeUnmount(() => {
-    if (gaming.value) {
+    if (gaming.value && score.value) {
       submitScore(score.value)
     }
   })
