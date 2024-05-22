@@ -1,36 +1,25 @@
 <template>
   <div class="box">
     <el-form
-      ref="formRef"
+      ref="ruleFormRef"
+      :rules="rules"
       style="max-width: 600px"
       :hide-required-asterisk="isLogin"
       :model="userInfo"
       label-width="auto"
       class="form"
     >
-      <el-form-item
-        label="账号"
-        prop="account"
-        minL
-        :rules="[
-          { required: true, message: '请输入账号' },
-        ]"
-      >
+      <el-form-item label="账号" prop="account" >
         <el-input
           v-model="userInfo.account"
           type="text"
           autocomplete="off"
-          minLength="6"
-          maxlength="10"
         />
       </el-form-item>
       <el-form-item
         label="用户名"
         prop="name"
         v-if="!isLogin"
-        :rules="[
-          { required: true, message: '请输入用户名' },
-        ]"
       >
         <el-input
           v-model="userInfo.name"
@@ -42,9 +31,6 @@
       <el-form-item
         label="密码"
         prop="pwd"
-        :rules="[
-          { required: true, message: '请输入密码' }
-        ]"
       >
         <el-input
           v-model="userInfo.pwd"
@@ -57,9 +43,6 @@
         label="确认密码"
         prop="checkPwd"
         v-if="!isLogin"
-        :rules="[
-          { required: true, message: '请确认密码' }
-        ]"
       >
         <el-input
           v-model="userInfo.checkPwd"
@@ -69,7 +52,7 @@
         />
       </el-form-item>
       <el-form-item v-if="isLogin">
-        <el-button type="primary" @click="handleLogin(formRef)">登 录</el-button>
+        <el-button type="primary" @click="handleLogin(ruleFormRef)">登 录</el-button>
         <el-button @click="toRegister">注 册</el-button>
       </el-form-item>
       <el-form-item v-if="!isLogin">
@@ -82,15 +65,17 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import type { FormInstance } from 'element-plus'
-  import { register, login } from '@/api/user';
+  import { register, login } from '@/api/user'
   import { md5 } from 'js-md5'
+  import type { LoginData, Response } from '@/utils/types'
+  import { setToken } from '@/utils/auth'
   import { useUserStore } from '@/stores/user'
-  import type { loginData, response } from '@/utils/types';
+  import { checkAccount } from '@/api/manageUser'
 
   const emits = defineEmits(['loginSuccess'])
-  const user = useUserStore()
-  const formRef = ref<FormInstance>()
+  const ruleFormRef = ref<FormInstance>()
   const isLogin = ref(true)
+  const userStore = useUserStore()
   const userInfo = reactive({
     account: '',
     name: '',
@@ -98,32 +83,76 @@
     checkPwd: ''
   })
 
+  const rules = {
+    account: [
+      { required: true, message: '请输入账号', trigger: 'blur' },
+      { min: 6, max: 10, message: '账号长度在6-10位', trigger: 'blur' },
+      { pattern: /^[0-9a-zA-Z]+$/, message: '账号只能包含数字和字母', trigger: ['change', 'blur'] },
+      { asyncValidator: async (rule: any, value: string, callback: Function) => {
+        if (isLogin.value) {
+          callback()
+          return
+        }
+        const res = await checkAccount(value)
+        if (res.code === 200) {
+          callback()
+        } else {
+          callback(new Error('账号已存在'))
+        }
+      }, trigger: 'blur' }
+    ],
+    name: [
+      { required: true , message: '请输入用户名', trigger: 'blur' },
+      { min: 2, max: 10, message: '用户名长度在2-10位', trigger: 'change' }
+    ],
+    pwd: [
+      { required: true, message: '请输入密码', trigger: 'blur' },
+      { min: 6, max: 16, message: '密码长度在6-16位之间', trigger: 'blur' },
+      { pattern: /^[a-zA-Z0-9_]+$/, message: '密码只能包含字母、数字和下划线', trigger: ['change', 'blur'] }
+    ],
+    checkPwd: [
+      { required: true, message: '请再次输入密码', trigger: 'blur' },
+      { validator: (rule: any, value: string, callback: Function) => {
+        if (value !== userInfo.pwd) {
+          callback(new Error('两次输入密码不一致'))
+        } else {
+          callback()
+        }
+      }, trigger: 'blur' }
+    ]
+  }
+
   const toRegister = () => {
     isLogin.value = false
   }
   
   const submitRegister = async () => {
-    formRef.value?.validate()
-      .then(() => console.log('校验通过'))
-      .catch(() => console.log('校验失败'))
-    const md5pwd = md5(userInfo.pwd)
-    try {
-      const data = await register({
-        account: userInfo.account,
-        name: userInfo.name,
-        pwd: md5pwd
-      })
-      if (data.code === 201) {
-        loginSuccess(data, '注册成功')
-      }
-    } catch (error) {
-      console.log('catch error')
-      if (error instanceof Error) {
-        ElMessage.error(error.message || '注册失败')
+    if (!ruleFormRef.value) return
+    await ruleFormRef.value.validate(async (valid) => {
+      if (valid) {
+        const md5pwd = md5(userInfo.pwd)
+        try {
+          const data = await register({
+            account: userInfo.account,
+            name: userInfo.name,
+            pwd: md5pwd
+          })
+          if (data.code === 201) {
+            loginSuccess(data, '注册成功')
+          }
+        } catch (error) {
+          console.log('catch error')
+          if (error instanceof Error) {
+            ElMessage.error(error.message || '注册失败')
+          } else {
+            ElMessage.error('注册失败')
+          }
+        }
       } else {
-        ElMessage.error('注册失败')
+        ElMessage.error('请检查输入')
       }
-    }
+    })
+   
   }
 
   const handleLogin = (formEl: FormInstance | undefined) => {
@@ -146,15 +175,14 @@
             ElMessage.error('登录失败')
           }
         }
-        console.log('error submit!')
         return false
       }
     })
   }
 
-  const loginSuccess = (data: loginData, msg: string) => {
-    localStorage.setItem('token', data.token)
-    user.setUser(JSON.parse(decodeURIComponent(atob(data.token.split('.')[1]))))
+  const loginSuccess = (data: LoginData, msg: string) => {
+    setToken(data.token)
+    userStore.setUser(JSON.parse(decodeURIComponent(atob(data.token.split('.')[1]))))
     ElMessage.success(msg)
     emits('loginSuccess')
   }
