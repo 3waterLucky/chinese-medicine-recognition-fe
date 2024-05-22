@@ -1,5 +1,5 @@
 import service from "../utils//axios-instance";
-import type { gameQuestion, gameResult } from "../utils/types";
+import type { gameQuestion, gameResult, rankList } from "../utils/types";
 
 
 // 获取问题
@@ -24,5 +24,13 @@ export function getRecord(): Promise<{ score: number, playtimes: number }> {
   return service({
     method: 'GET',
     url: '/game/record'
+  })
+}
+
+// 查询排行榜
+export function getRankList(): Promise<rankList> {
+  return service({
+    method: 'GET',
+    url: '/game/rank'
   })
 }

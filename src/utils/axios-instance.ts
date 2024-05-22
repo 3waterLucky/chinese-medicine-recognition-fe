@@ -6,6 +6,7 @@ import { getToken } from './auth'
 import { removeToken } from './auth'
 import router from '../router'
 import { type AxiosRequestConfig } from 'axios'
+import type { ErrorType } from './types'
 
 const service = axios.create({
   baseURL: '/api',
@@ -36,7 +37,7 @@ service.interceptors.response.use(
     if (error.response.status === 500) {
       ElMessage.error(error.response.data.message)
     }
-    return Promise.reject(error.response.data)
+    return Promise.reject(error.response.data as ErrorType)
   }
 )
 

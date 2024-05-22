@@ -45,6 +45,7 @@
           :outputType="cropperOption.outputType"
           :fixed="cropperOption.fixed"
           :original="cropperOption.original"
+          :mode="cropperOption.mode"
         ></vueCropper>
       </div>
       <div class="center">
@@ -56,8 +57,26 @@
           <img :src="croppedImgSrc">
         </div>
         <div class="right">
-          <el-button v-show="resultReceived" type="primary" color="#f5a623">添加收藏</el-button>
-          <el-button v-show="resultReceived" type="primary">查看详情</el-button>
+          <el-button 
+            @click="handleCollection"
+            v-show="resultReceived && !collected" 
+            type="primary" 
+            color="#f5a623" 
+            style="color: #fff"
+          >
+            添加收藏
+          </el-button>
+          <el-button 
+            @click="handleCancelCollection"
+            v-show="resultReceived && collected" 
+            type="primary" 
+            color="#dbc163" 
+            style="color: #bbb"
+          >
+            已收藏
+          </el-button>
+          <el-button v-show="resultReceived" type="primary" @click="detailDialogVisible = true">查看详情</el-button>
+          <MedInfoDialog v-model:visible="detailDialogVisible" :m_id="recogResult.m_id" />
         </div>
       </div>
       <div class="recognizing" v-show="loading">识别中...</div>
@@ -106,6 +125,8 @@ import IconEvaColorC from '@/components/icons/IconEvaColorC.vue'
 import IconEvaGreyA from '@/components/icons/IconEvaGreyA.vue'
 import IconEvaGreyB from '@/components/icons/IconEvaGreyB.vue'
 import IconEvaGreyC from '@/components/icons/IconEvaGreyC.vue'
+import { addCollection, cancelCollection } from '@/api/medicine'
+import type MedInfoDialog from '@/components/MedInfoDialog.vue'
 
 const recogResult = ref<{
   name: string,
@@ -123,18 +144,21 @@ const fileSelected = ref(false)
 const resultReceived = ref(false)
 const showCropper = ref(false)
 const croppedImgSrc = ref('')
-const dialogTitle = ref("请截取图中您要识别的中草药")
-const upload = ref<UploadInstance>()
-const cropper = ref()
-const accuracy = ref(0)
-const evaSelected = ref(-1)
+const dialogTitle = ref("请截取图中您要识别的中草药")   // el-dialog标题
+const upload = ref<UploadInstance>()    // el-upload实例
+const cropper = ref()     // vue-cropper实例
+const accuracy = ref(0)   // 用户评价的准确率
+const evaSelected = ref(-1) // 0: 不准确 1: 很准确 2: 不清楚
+const collected = ref(false)    // 是否已收藏
+const detailDialogVisible = ref(false)    // 详情弹窗是否显示
 
 const cropperOption = reactive({
   img: '',
   size: 1,
   outputType: 'jpeg',
   fixed: true,
-  original: true
+  original: true,
+  mode: 'contain'
 })
 
 onBeforeMount(async () => {
@@ -167,6 +191,8 @@ const handleConfirm = () => {
       submitEvaluate({
         id: recogResult.value!.recog_id,
         score: evaSelected.value
+      }).finally(() => {
+        evaSelected.value = -1
       })
     }
     dialogTitle.value = "请截取图中您要识别的中草药"
@@ -201,6 +227,28 @@ const handleConfirm = () => {
         }, 'image/jpeg')
       }
     })
+  }
+}
+
+const handleCollection = async () => {
+  try {
+    const res = await addCollection(recogResult.value.m_id)
+    if (res.code === 200) {
+      collected.value = true
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const handleCancelCollection = async () => {
+  try {
+    const res = await cancelCollection(recogResult.value.m_id)
+    if (res.code === 200) {
+      collected.value = false
+    }
+  } catch (error) {
+    console.error(error)
   }
 }
 

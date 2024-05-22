@@ -1,8 +1,8 @@
 import service from "../utils/axios-instance";
-import type { userInfo, loginData } from "../utils/types";
+import type { UserInfo, LoginData, UpdateUserInfo, UpdateUserInfoResult } from "../utils/types";
 
 // 注册
-export function register(userInfo: userInfo): Promise<loginData> {
+export function register(userInfo: UserInfo): Promise<LoginData> {
   return service({
     method: 'POST',
     url: '/users/register',
@@ -11,7 +11,7 @@ export function register(userInfo: userInfo): Promise<loginData> {
 }
 
 // 登录
-export function login(userInfo: userInfo): Promise<loginData>{
+export function login(userInfo: UserInfo): Promise<LoginData>{
   return service({
     method: 'POST',
     url: '/users/login',
@@ -24,5 +24,14 @@ export function logout() {
   return service({
     method: 'POST',
     url: '/users/logout'
+  })
+}
+
+// 修改信息
+export function updateUserInfo(updateInfo: UpdateUserInfo): Promise<UpdateUserInfoResult> {
+  return service({
+    method: 'POST',
+    url: '/users/updateInfo',
+    data: updateInfo
   })
 }

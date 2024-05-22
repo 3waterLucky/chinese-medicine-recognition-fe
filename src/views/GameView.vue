@@ -23,9 +23,36 @@
       </template>
       <template v-if="!gaming">
         <div class="end">游戏结束</div>
-        <div class="finalScore">本局得分：{{ score }}</div>
-        <div class="total">您的总积分为：{{ totalScore }}</div>
-        <el-button @click="restart">再来一局</el-button>
+        <div class="finalScore">本局得分：<span>{{ score }}</span></div>
+        <div class="total">您的总积分为：<span>{{ totalScore }}</span></div>
+        <el-button class="again" @click="restart">再来一局</el-button>
+        <el-button class="again" @click="showRank">查看排行榜</el-button>
+        <el-dialog
+          title="排行榜"
+          v-model="rankDialogVisible"
+          width="20%"
+          @close="() => rankDialogVisible = false"
+        >
+          <el-table
+            :data="rankList"
+            stripe
+            border
+            height="55vh"
+          >
+            <el-table-column
+              prop="user_name"
+              label="用户名"
+              min-width="100%"
+              align="center"
+            ></el-table-column>
+            <el-table-column
+              prop="score"
+              label="得分"
+              min-width="100%"
+              align="center"
+            ></el-table-column>
+          </el-table>
+        </el-dialog>
       </template>
     </div>
   </div>
@@ -33,14 +60,14 @@
 
 <script setup lang="ts">
   import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
-  import { getQuestion, submitScore } from '@/api/game'
+  import { getQuestion, submitScore, getRankList } from '@/api/game'
 
-  const answer = ref('')
-  const options = ref<string[]>([])
-  const imgSrc = ref('')
-  const score = ref(0)
-  const gaming = ref(true)
-  const totalScore = ref(0)
+  const answer = ref('')    // 正确答案
+  const options = ref<string[]>([])   // 选项
+  const imgSrc = ref('')    // 图片地址
+  const score = ref(0)    // 得分
+  const gaming = ref(true)    // 是否正在游戏
+  const totalScore = ref(0)   // 总积分
 
   const refreshQuestion = async () => {
     isWaiting.value = true
@@ -78,7 +105,6 @@
           resolve()
         }, 2000))
       ])
-      console.log(gameResult)
       totalScore.value = gameResult.totalScore
     }
   }
@@ -87,6 +113,15 @@
     gaming.value = true
     score.value = 0
     refreshQuestion()
+  }
+
+  const rankDialogVisible = ref(false)  // 排行榜对话框是否显示
+  const rankList = ref([])   // 排行榜数据
+
+  const showRank = async () => {
+    rankDialogVisible.value = true
+    const data = await getRankList()
+    rankList.value = data.rankList
   }
 
   onBeforeMount(() => {
@@ -200,6 +235,44 @@
           background-color: #f4aab9;
         }
       }
+    }
+  }
+
+  .end {
+    font-size: 1.5rem;
+    color: #ea3a3a;
+    margin-bottom: 3vh;
+  }
+
+  .finalScore {
+    font-size: 1.2rem;
+    margin-bottom: 3vh;
+    span {
+      color: #693aea;
+    }
+  }
+
+  .total {
+    font-size: 1.2rem;
+    margin-bottom: 3vh;
+    span {
+      color: #693aea;
+    }
+  }
+
+  .again {
+    width: 10vw;
+    height: 5vh;
+    margin-bottom: 3vh;
+    margin-left: 0;
+    font-size: 1.2rem;
+    background-color: #24546c;
+    color: #fff;
+    border: none;
+    border-radius: 2.5vh;
+    cursor: pointer;
+    &:hover {
+      background-color: #6e95a9;
     }
   }
 </style>

@@ -1,8 +1,8 @@
 import service from "../utils/axios-instance";
-import type { userInfo, gameQuestion, gameResult, recogResult, loginData, response } from "../utils/types";
+import type { RecogResult, Response } from "../utils/types";
 
 // 识别图片
-export function recognize(image: FormData): Promise<recogResult> {
+export function recognize(image: FormData): Promise<RecogResult> {
   return service({
     method: 'POST',
     url: '/recog',
@@ -22,7 +22,7 @@ export function getAccuracy(): Promise<{ accuracy: number }> {
 }
 
 // 提交用户评价
-export function submitEvaluate(data: { id: number, score: number }): Promise<response> {
+export function submitEvaluate(data: { id: number, score: number }): Promise<Response> {
   return service({
     method: 'POST',
     url: '/recog/evaluate',
